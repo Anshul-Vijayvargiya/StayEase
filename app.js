@@ -15,7 +15,7 @@ const ExpressError = require("./utils/ExpressError.js");
 const listingRouter = require("./routes/listings.js");
 const ReviewRouter = require("./routes/review.js");
 const session = require("express-session");
-const MongoStore = require("connect-mongo");
+const MongoStore = require("connect-mongo").default;
 const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
@@ -54,17 +54,19 @@ app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
 
 const store = MongoStore.create({
-  store,
   mongoUrl: dburl,
-  crypto:{
-    secret:process.env.SECRET,
+  crypto: {
+    secret: "yourSecret"
   },
-  touchAfter:24*60*60
+  touchAfter: 24 * 3600
 });
-  
 
+store.on("error", ()=>{
+  console.log("Session Store Error");
+});
 
 const sessionOptions={
+  store,
   secret: process.env.SECRET, 
   resave: false,
   saveUninitialized: true,
